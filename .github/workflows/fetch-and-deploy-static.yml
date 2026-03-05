@@ -226,7 +226,6 @@ jobs:
             https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git \
             HEAD:gh-pages
 
-
       - name: Summary
         run: |
           echo "✅ Market data published to GitHub Pages!"

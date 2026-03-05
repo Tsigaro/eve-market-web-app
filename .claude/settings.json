@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/s-nar/**)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); proj=list\\(d.get\\(''projects'',{}\\).values\\(\\)\\)[0] if d.get\\(''projects''\\) else {}; print\\(json.dumps\\(proj.get\\(''mcpServers'',{}\\), indent=2\\)\\)\")",
+      "Bash(node -e \"const d=require\\(''/c/Users/s-nar/.claude.json''\\); const proj=Object.values\\(d.projects||{}\\)[0]||{}; console.log\\(JSON.stringify\\(proj.mcpServers||{},null,2\\)\\)\")",
+      "Bash(python3 -c \":*)",
+      "Bash(node -e \":*)",
+      "Bash(npx @anthropic-ai/claude-code mcp list)",
+      "Bash(npx --yes @anthropic-ai/claude-code mcp list)",
+      "Bash(wrangler --version)",
+      "Bash(gh --version)",
+      "Bash(npx @anthropic-ai/claude-code mcp add --transport http cloudflare https://bindings.mcp.cloudflare.com/mcp)",
+      "Bash(npx @anthropic-ai/claude-code mcp add --transport http cloudflare https://bindings.mcp.cloudflare.com/mcp -s user)",
+      "Bash(npx @anthropic-ai/claude-code mcp add --transport http cloudflare https://bindings.mcp.cloudflare.com/mcp -H \"Authorization: Bearer TQ_VkIC9PtngQ-WzEJQAF2Pv92Ch7Ph6CLXtZ1mW\" -s user)",
+      "Bash(npx @anthropic-ai/claude-code mcp remove cloudflare -s user)",
+      "Bash(CLOUDFLARE_API_TOKEN=\"TQ_VkIC9PtngQ-WzEJQAF2Pv92Ch7Ph6CLXtZ1mW\" npx wrangler whoami)",
+      "Bash(npm run build)",
+      "Bash(npm install)",
+      "Bash(CLOUDFLARE_API_TOKEN=\"TQ_VkIC9PtngQ-WzEJQAF2Pv92Ch7Ph6CLXtZ1mW\" npx wrangler pages project create eve-market-web-app --production-branch main)",
+      "Bash(CLOUDFLARE_API_TOKEN=\"TQ_VkIC9PtngQ-WzEJQAF2Pv92Ch7Ph6CLXtZ1mW\" CLOUDFLARE_ACCOUNT_ID=\"99bab8e5adb9b799c73d994c08948658\" npx wrangler pages project create eve-market-web-app --production-branch main)",
+      "Bash(CLOUDFLARE_API_TOKEN=\"TQ_VkIC9PtngQ-WzEJQAF2Pv92Ch7Ph6CLXtZ1mW\" CLOUDFLARE_ACCOUNT_ID=\"99bab8e5adb9b799c73d994c08948658\" npx wrangler pages deploy out --project-name eve-market-web-app --branch main)",
+      "Bash(CLOUDFLARE_API_TOKEN=\"TQ_VkIC9PtngQ-WzEJQAF2Pv92Ch7Ph6CLXtZ1mW\" CLOUDFLARE_ACCOUNT_ID=\"99bab8e5adb9b799c73d994c08948658\" npx wrangler pages project list)",
+      "Bash(CLOUDFLARE_API_TOKEN=\"TQ_VkIC9PtngQ-WzEJQAF2Pv92Ch7Ph6CLXtZ1mW\" CLOUDFLARE_ACCOUNT_ID=\"99bab8e5adb9b799c73d994c08948658\" npx wrangler pages deploy /c/Users/s-nar/src/eve-market-web-app/webapp/out --project-name eve-market-web-app --branch main)",
+      "Bash(NEXT_PUBLIC_DATA_BASE_URL=\"https://tsigaro.github.io/eve-market-web-app\" npm run build)",
+      "Bash(CLOUDFLARE_API_TOKEN=\"TQ_VkIC9PtngQ-WzEJQAF2Pv92Ch7Ph6CLXtZ1mW\" CLOUDFLARE_ACCOUNT_ID=\"99bab8e5adb9b799c73d994c08948658\" npx wrangler pages deploy /c/Users/s-nar/src/eve-market-web-app/webapp/out --project-name eve-market-web-app --branch main --commit-dirty=true)",
+      "Bash(gh secret list --repo Tsigaro/eve-market-web-app)",
+      "Bash(where gh)",
+      "Bash(npx gh secret list --repo Tsigaro/eve-market-web-app)"
+    ]
+  }
+}

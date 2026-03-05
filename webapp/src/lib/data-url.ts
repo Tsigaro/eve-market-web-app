@@ -3,7 +3,7 @@
  *
  * Local dev:  NEXT_PUBLIC_DATA_BASE_URL is empty → uses relative /data/ paths
  *             served by Next.js from public/data/
- * Production: NEXT_PUBLIC_DATA_BASE_URL=https://ferlorin.github.io/eve-market-web-app
+ * Production: NEXT_PUBLIC_DATA_BASE_URL=https://tsigaro.github.io/eve-market-web-app
  *             files are served from the gh-pages branch
  */
 const BASE = process.env.NEXT_PUBLIC_DATA_BASE_URL ?? '';

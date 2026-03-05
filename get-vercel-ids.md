@@ -28,7 +28,7 @@ cat .vercel/project.json
 ## Add to GitHub Secrets
 
 Once you have the IDs, add them to GitHub:
-1. Go to https://github.com/Ferlorin/eve-market-web-app/settings/secrets/actions
+1. Go to https://github.com/tsigaro/eve-market-web-app/settings/secrets/actions
 2. Click "New repository secret"
 3. Add:
    - Name: `VERCEL_ORG_ID`, Value: (your org ID)

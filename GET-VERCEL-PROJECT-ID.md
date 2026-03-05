@@ -11,7 +11,7 @@ Go to Vercel dashboard:
 
 ## Step 2: Add to GitHub Secrets
 
-1. Go to: https://github.com/Ferlorin/eve-market-web-app/settings/secrets/actions
+1. Go to: https://github.com/tsigaro/eve-market-web-app/settings/secrets/actions
 2. Click **"New repository secret"**
 3. Name: `VERCEL_PROJECT_ID`
 4. Value: (paste the project ID you copied)
@@ -29,7 +29,7 @@ This will prevent Vercel from auto-creating new projects!
 If you don't want to add the project ID:
 1. Go to the **"webapp"** project settings
 2. Go to **Git** → **Connected Git Repository**
-3. Make sure it's connected to `Ferlorin/eve-market-web-app`
+3. Make sure it's connected to `tsigaro/eve-market-web-app`
 4. Set **Production Branch**: `main`
 5. This should help Vercel auto-detect the right project
 
