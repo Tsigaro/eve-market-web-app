@@ -132,7 +132,7 @@ function HomePageContent() {
 
       {/* Header */}
       <header className="border-b theme-border theme-bg-secondary">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold theme-text-primary">
@@ -148,7 +148,7 @@ function HomePageContent() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Market Selection Section */}
         <section className="mb-8" aria-labelledby="market-selection-heading">
           <h2 id="market-selection-heading" className="sr-only">
