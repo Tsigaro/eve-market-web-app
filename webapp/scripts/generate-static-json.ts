@@ -90,23 +90,18 @@ async function fetchTypeName(typeId: number): Promise<string> {
 }
 
 /**
- * Fetch station or structure name from ESI
+ * Fetch station name from ESI. Returns null for player structures (require OAuth).
  */
-async function fetchLocationName(locationId: number): Promise<string> {
+async function fetchLocationName(locationId: number): Promise<string | null> {
+  if (locationId >= 100_000_000) {
+    // Player structure (citadel) — requires OAuth, skip
+    return null;
+  }
   try {
-    if (locationId < 100_000_000) {
-      // NPC station
-      const res = await fetch(`https://esi.evetech.net/latest/universe/stations/${locationId}/`);
-      if (!res.ok) return `Station ${locationId}`;
-      const data = await res.json() as { name?: string };
-      return data.name ?? `Station ${locationId}`;
-    } else {
-      // Player structure (citadel) — may be private (403)
-      const res = await fetch(`https://esi.evetech.net/latest/universe/structures/${locationId}/`);
-      if (!res.ok) return `Station ${locationId}`;
-      const data = await res.json() as { name?: string };
-      return data.name ?? `Station ${locationId}`;
-    }
+    const res = await fetch(`https://esi.evetech.net/latest/universe/stations/${locationId}/`);
+    if (!res.ok) return `Station ${locationId}`;
+    const data = await res.json() as { name?: string };
+    return data.name ?? `Station ${locationId}`;
   } catch {
     return `Station ${locationId}`;
   }
@@ -354,7 +349,7 @@ async function generateStaticJSON() {
 
   // --- Resolve names from ESI — items and stations run in parallel, 50 concurrent each ---
   const typeNames = new Map<number, string>();
-  const locationNames = new Map<number, string>();
+  const locationNames = new Map<number, string | null>();
 
   console.log(`\nResolving ${allTypeIds.size} item names + ${allLocationIds.size} station names from ESI (parallel)...`);
   await Promise.all([
@@ -381,18 +376,23 @@ async function generateStaticJSON() {
       const opportunities = calculateOpportunitiesFromMaps(buyMaps, sellMaps);
       const topOpportunities = opportunities.slice(0, 1000);
 
-      const outputOpportunities: Opportunity[] = topOpportunities.map(opp => ({
-        typeId: opp.typeId,
-        itemName: typeNames.get(opp.typeId) ?? `Item ${opp.typeId}`,
-        buyPrice: opp.buyPrice,
-        sellPrice: opp.sellPrice,
-        profitPerUnit: opp.profitPerUnit,
-        buyStation: locationNames.get(opp.buyLocationId) ?? `Station ${opp.buyLocationId}`,
-        sellStation: locationNames.get(opp.sellLocationId) ?? `Station ${opp.sellLocationId}`,
-        roi: opp.roi,
-        volumeAvailable: opp.volumeAvailable,
-        maxProfit: opp.maxProfit,
-      }));
+      const outputOpportunities: Opportunity[] = topOpportunities
+        .filter(opp =>
+          locationNames.get(opp.buyLocationId) !== null &&
+          locationNames.get(opp.sellLocationId) !== null
+        )
+        .map(opp => ({
+          typeId: opp.typeId,
+          itemName: typeNames.get(opp.typeId) ?? `Item ${opp.typeId}`,
+          buyPrice: opp.buyPrice,
+          sellPrice: opp.sellPrice,
+          profitPerUnit: opp.profitPerUnit,
+          buyStation: locationNames.get(opp.buyLocationId) ?? `Station ${opp.buyLocationId}`,
+          sellStation: locationNames.get(opp.sellLocationId) ?? `Station ${opp.sellLocationId}`,
+          roi: opp.roi,
+          volumeAvailable: opp.volumeAvailable,
+          maxProfit: opp.maxProfit,
+        }));
 
       const output: StaticOpportunityFile = {
         lastUpdated: new Date().toISOString(),
