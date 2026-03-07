@@ -393,10 +393,10 @@ export function OpportunityTable({ data, regionKey, onRefresh, isRefreshing = fa
       </div>
 
       {/* Scrollable table area */}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto overflow-y-auto max-h-[70vh]">
         {/* Fixed Table Header with Sortable + Resizable Columns */}
         <div
-          className="border-b theme-border theme-bg-primary"
+          className="sticky top-0 z-10 border-b theme-border theme-bg-primary"
           role="rowgroup"
         >
           <div className="grid gap-4 px-4 py-3" style={gridStyle} role="row">
