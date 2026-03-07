@@ -14,6 +14,7 @@ import { useRegions } from '@/lib/queries/regions';
 import { useOpportunities } from '@/lib/queries/opportunities';
 import { useQuery } from '@tanstack/react-query';
 import type { Region } from '@/lib/regions';
+import { TRADE_HUBS } from '@/lib/regions';
 import { metadataUrl } from '@/lib/data-url';
 
 function HomePageContent() {
@@ -154,9 +155,9 @@ function HomePageContent() {
           <h2 id="market-selection-heading" className="sr-only">
             Market Selection
           </h2>
-          <div className="flex flex-col md:flex-row items-start md:items-end gap-4">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
             {/* Buy Market */}
-            <div className="flex-1 w-full">
+            <div className="flex-1 w-full space-y-2">
               <RegionSelector
                 label="Buy Market"
                 placeholder={hasData ? "Select region to buy from..." : "Waiting for market data..."}
@@ -166,6 +167,27 @@ function HomePageContent() {
                 autoFocus
                 disabled={!hasData}
               />
+              <div className="flex flex-wrap gap-1.5">
+                {TRADE_HUBS.map(hub => {
+                  const region = regions?.find(r => r.regionId === hub.regionId);
+                  const isActive = buyMarket?.regionId === hub.regionId;
+                  return (
+                    <button
+                      key={hub.regionId}
+                      onClick={() => region && setBuyMarket(region)}
+                      disabled={!hasData || !region}
+                      className={`px-2 py-0.5 text-xs rounded-full border transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
+                        isActive
+                          ? 'border-eve-blue text-eve-blue bg-eve-blue/10'
+                          : 'theme-border theme-text-secondary hover:border-eve-blue hover:text-eve-blue'
+                      }`}
+                      title={hub.regionName}
+                    >
+                      {hub.systemName}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Swap Button */}
@@ -180,7 +202,7 @@ function HomePageContent() {
             </button>
 
             {/* Sell Market */}
-            <div className="flex-1 w-full">
+            <div className="flex-1 w-full space-y-2">
               <RegionSelector
                 label="Sell Market"
                 placeholder={hasData ? "Select region to sell in..." : "Waiting for market data..."}
@@ -189,6 +211,27 @@ function HomePageContent() {
                 regions={regions ?? []}
                 disabled={!hasData}
               />
+              <div className="flex flex-wrap gap-1.5">
+                {TRADE_HUBS.map(hub => {
+                  const region = regions?.find(r => r.regionId === hub.regionId);
+                  const isActive = sellMarket?.regionId === hub.regionId;
+                  return (
+                    <button
+                      key={hub.regionId}
+                      onClick={() => region && setSellMarket(region)}
+                      disabled={!hasData || !region}
+                      className={`px-2 py-0.5 text-xs rounded-full border transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
+                        isActive
+                          ? 'border-eve-blue text-eve-blue bg-eve-blue/10'
+                          : 'theme-border theme-text-secondary hover:border-eve-blue hover:text-eve-blue'
+                      }`}
+                      title={hub.regionName}
+                    >
+                      {hub.systemName}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 

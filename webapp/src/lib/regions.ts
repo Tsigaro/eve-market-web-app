@@ -6,20 +6,36 @@
 export interface Region {
   regionId: number;
   name: string;
+  notableSystems?: string[];
+}
+
+export interface TradeHub {
+  systemName: string;
+  regionId: number;
+  regionName: string;
 }
 
 // High-volume EVE Online trade hubs
 const HIGH_VOLUME_REGIONS: Region[] = [
-  { regionId: 10000002, name: 'The Forge' },       // Jita
-  { regionId: 10000043, name: 'Domain' },          // Amarr
-  { regionId: 10000042, name: 'Metropolis' },      // Hek
-  { regionId: 10000032, name: 'Sinq Laison' },     // Dodixie
+  { regionId: 10000002, name: 'The Forge', notableSystems: ['Jita'] },
+  { regionId: 10000043, name: 'Domain', notableSystems: ['Amarr'] },
+  { regionId: 10000042, name: 'Metropolis', notableSystems: ['Hek'] },
+  { regionId: 10000032, name: 'Sinq Laison', notableSystems: ['Dodixie'] },
+];
+
+// Quick-select trade hub presets (most active markets)
+export const TRADE_HUBS: TradeHub[] = [
+  { systemName: 'Jita', regionId: 10000002, regionName: 'The Forge' },
+  { systemName: 'Amarr', regionId: 10000043, regionName: 'Domain' },
+  { systemName: 'Hek', regionId: 10000042, regionName: 'Metropolis' },
+  { systemName: 'Dodixie', regionId: 10000032, regionName: 'Sinq Laison' },
+  { systemName: 'Rens', regionId: 10000030, regionName: 'Heimatar' },
 ];
 
 // Additional K-space trading regions (empire + border lowsec)
 const ACTIVE_REGIONS: Region[] = [
   // Minmatar
-  { regionId: 10000030, name: 'Heimatar' },        // Rens
+  { regionId: 10000030, name: 'Heimatar', notableSystems: ['Rens'] },        // Rens
   { regionId: 10000028, name: 'Molden Heath' },
   // Caldari
   { regionId: 10000016, name: 'Lonetrek' },

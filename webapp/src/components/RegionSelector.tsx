@@ -39,14 +39,17 @@ export function RegionSelector({
     if (query === '') return regions;
 
     const lowerQuery = query.toLowerCase();
-    
+
     return regions.filter((region) => {
       const lowerName = region.name.toLowerCase();
-      
-      // Exact match or substring match
+
+      // Exact match or substring match on region name
       if (lowerName.includes(lowerQuery)) return true;
-      
-      // Fuzzy match: all query chars appear in order
+
+      // Match on notable systems (e.g. "Jita" → The Forge)
+      if (region.notableSystems?.some(s => s.toLowerCase().includes(lowerQuery))) return true;
+
+      // Fuzzy match on region name: all query chars appear in order
       let queryIndex = 0;
       for (let i = 0; i < lowerName.length && queryIndex < lowerQuery.length; i++) {
         if (lowerName[i] === lowerQuery[queryIndex]) {
@@ -123,12 +126,19 @@ export function RegionSelector({
                   >
                     {({ active, selected }) => (
                       <>
-                        <span
-                          className={`block truncate ${
-                            selected ? 'font-semibold' : 'font-normal'
-                          }`}
-                        >
-                          {region.name}
+                        <span className="flex items-baseline gap-2">
+                          <span
+                            className={`truncate ${
+                              selected ? 'font-semibold' : 'font-normal'
+                            }`}
+                          >
+                            {region.name}
+                          </span>
+                          {region.notableSystems && region.notableSystems.length > 0 && (
+                            <span className="text-xs opacity-50 shrink-0">
+                              {region.notableSystems.join(', ')}
+                            </span>
+                          )}
                         </span>
 
                         {selected && (
