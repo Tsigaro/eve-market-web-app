@@ -26,6 +26,8 @@ interface RegionSelectorProps {
   systems?: SolarSystem[];
   disabled?: boolean;
   autoFocus?: boolean;
+  isFavorite?: boolean;
+  onToggleFavorite?: () => void;
 }
 
 export function RegionSelector({
@@ -36,7 +38,9 @@ export function RegionSelector({
   regions,
   systems = [],
   disabled = false,
-  autoFocus = false
+  autoFocus = false,
+  isFavorite = false,
+  onToggleFavorite,
 }: RegionSelectorProps) {
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -118,39 +122,54 @@ export function RegionSelector({
               {label}
             </Combobox.Label>
 
-            {/* Input Field */}
-            <div className="relative">
-              <Combobox.Input
-                ref={inputRef}
-                className="w-full rounded-lg border theme-border theme-bg-secondary py-2 pl-3 pr-10 theme-text-primary placeholder:text-gray-500
-                  focus:border-eve-blue focus:outline-none focus:ring-2 focus:ring-eve-blue focus:ring-offset-2 focus:ring-offset-gray-900
-                  focus-visible:ring-2 focus-visible:ring-eve-blue focus-visible:ring-offset-2
-                  disabled:cursor-not-allowed disabled:opacity-50
-                  sm:text-sm transition-colors"
-                placeholder={placeholder}
-                displayValue={(region: Region | null) => region?.name ?? ''}
-                onChange={(event) => setQuery(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === 'ArrowDown' && !open) {
-                    event.preventDefault();
-                    inputRef.current?.click();
-                  }
-                  if (event.key === 'Escape') {
-                    setQuery('');
-                  }
-                }}
-              />
-
-              <Combobox.Button
-                className="absolute inset-y-0 right-0 flex items-center rounded-r-lg px-2
-                  focus:outline-none focus-visible:ring-2 focus-visible:ring-eve-blue focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
-                aria-label="Toggle region dropdown"
-              >
-                <ChevronUpDownIcon
-                  className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-colors"
-                  aria-hidden="true"
+            {/* Input + Star Button row */}
+            <div className="flex items-center gap-2">
+              {/* Input Field */}
+              <div className="relative flex-1">
+                <Combobox.Input
+                  ref={inputRef}
+                  className="w-full rounded-lg border theme-border theme-bg-secondary py-2 pl-3 pr-10 theme-text-primary placeholder:text-gray-500
+                    focus:border-eve-blue focus:outline-none focus:ring-2 focus:ring-eve-blue focus:ring-offset-2 focus:ring-offset-gray-900
+                    focus-visible:ring-2 focus-visible:ring-eve-blue focus-visible:ring-offset-2
+                    disabled:cursor-not-allowed disabled:opacity-50
+                    sm:text-sm transition-colors"
+                  placeholder={placeholder}
+                  displayValue={(region: Region | null) => region?.name ?? ''}
+                  onChange={(event) => setQuery(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'ArrowDown' && !open) {
+                      event.preventDefault();
+                      inputRef.current?.click();
+                    }
+                    if (event.key === 'Escape') {
+                      setQuery('');
+                    }
+                  }}
                 />
-              </Combobox.Button>
+
+                <Combobox.Button
+                  className="absolute inset-y-0 right-0 flex items-center rounded-r-lg px-2
+                    focus:outline-none focus-visible:ring-2 focus-visible:ring-eve-blue focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
+                  aria-label="Toggle region dropdown"
+                >
+                  <ChevronUpDownIcon
+                    className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-colors"
+                    aria-hidden="true"
+                  />
+                </Combobox.Button>
+              </div>
+
+              {/* Star Button — only shown when a region is selected */}
+              {value && onToggleFavorite && (
+                <button
+                  type="button"
+                  onClick={onToggleFavorite}
+                  aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                  className="text-lg leading-none text-eve-gold hover:opacity-70 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-eve-blue rounded"
+                >
+                  {isFavorite ? '★' : '☆'}
+                </button>
+              )}
             </div>
 
             {/* Dropdown Options */}

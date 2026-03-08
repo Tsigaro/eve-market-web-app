@@ -16,6 +16,7 @@ import { useOpportunities } from '@/lib/queries/opportunities';
 import { useQuery } from '@tanstack/react-query';
 import type { Region } from '@/lib/regions';
 import { TRADE_HUBS, NOTABLE_SYSTEMS } from '@/lib/regions';
+import { useFavoriteRegions } from '@/lib/use-favorite-regions';
 import { metadataUrl } from '@/lib/data-url';
 
 function HomePageContent() {
@@ -25,6 +26,7 @@ function HomePageContent() {
   const [buyMarket, setBuyMarket] = useState<Region | null>(null);
   const [sellMarket, setSellMarket] = useState<Region | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const { favoriteIds, toggleFavorite, isFavorite } = useFavoriteRegions();
 
   // Check if metadata exists (data available)
   const { data: metadata } = useQuery({
@@ -176,27 +178,63 @@ function HomePageContent() {
                 systems={NOTABLE_SYSTEMS}
                 autoFocus
                 disabled={!hasData}
+                isFavorite={buyMarket ? isFavorite(buyMarket.regionId) : false}
+                onToggleFavorite={buyMarket ? () => toggleFavorite(buyMarket.regionId) : undefined}
               />
               <div className="flex flex-wrap gap-1.5">
-                {TRADE_HUBS.map(hub => {
-                  const region = regions?.find(r => r.regionId === hub.regionId);
-                  const isActive = buyMarket?.regionId === hub.regionId;
-                  return (
-                    <button
-                      key={hub.regionId}
-                      onClick={() => region && setBuyMarket(region)}
-                      disabled={!hasData || !region}
-                      className={`px-3 py-1 text-sm rounded-full border transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
-                        isActive
-                          ? 'border-eve-blue text-eve-blue bg-eve-blue/10'
-                          : 'theme-border theme-text-secondary hover:border-eve-blue hover:text-eve-blue'
-                      }`}
-                      title={hub.regionName}
-                    >
-                      {hub.systemName}
-                    </button>
-                  );
-                })}
+                {favoriteIds.size > 0
+                  ? [...favoriteIds].map(id => {
+                      const region = regions?.find(r => r.regionId === id);
+                      if (!region) return null;
+                      const isActive = buyMarket?.regionId === id;
+                      return (
+                        <span key={id} className="inline-flex items-center">
+                          <button
+                            onClick={() => setBuyMarket(region)}
+                            disabled={!hasData}
+                            className={`px-3 py-1 text-sm rounded-l-full border-y border-l transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
+                              isActive
+                                ? 'border-eve-blue text-eve-blue bg-eve-blue/10'
+                                : 'theme-border theme-text-secondary hover:border-eve-blue hover:text-eve-blue'
+                            }`}
+                          >
+                            {region.name}
+                          </button>
+                          <button
+                            onClick={() => toggleFavorite(id)}
+                            disabled={!hasData}
+                            aria-label={`Remove ${region.name} from favorites`}
+                            className={`px-1.5 py-1 text-xs rounded-r-full border-y border-r transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
+                              isActive
+                                ? 'border-eve-blue text-eve-blue bg-eve-blue/10'
+                                : 'theme-border theme-text-secondary hover:border-red-400 hover:text-red-400'
+                            }`}
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      );
+                    })
+                  : TRADE_HUBS.map(hub => {
+                      const region = regions?.find(r => r.regionId === hub.regionId);
+                      const isActive = buyMarket?.regionId === hub.regionId;
+                      return (
+                        <button
+                          key={hub.regionId}
+                          onClick={() => region && setBuyMarket(region)}
+                          disabled={!hasData || !region}
+                          className={`px-3 py-1 text-sm rounded-full border transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
+                            isActive
+                              ? 'border-eve-blue text-eve-blue bg-eve-blue/10'
+                              : 'theme-border theme-text-secondary hover:border-eve-blue hover:text-eve-blue'
+                          }`}
+                          title={hub.regionName}
+                        >
+                          {hub.systemName}
+                        </button>
+                      );
+                    })
+                }
               </div>
             </div>
 
@@ -221,27 +259,63 @@ function HomePageContent() {
                 regions={regions ?? []}
                 systems={NOTABLE_SYSTEMS}
                 disabled={!hasData}
+                isFavorite={sellMarket ? isFavorite(sellMarket.regionId) : false}
+                onToggleFavorite={sellMarket ? () => toggleFavorite(sellMarket.regionId) : undefined}
               />
               <div className="flex flex-wrap gap-1.5">
-                {TRADE_HUBS.map(hub => {
-                  const region = regions?.find(r => r.regionId === hub.regionId);
-                  const isActive = sellMarket?.regionId === hub.regionId;
-                  return (
-                    <button
-                      key={hub.regionId}
-                      onClick={() => region && setSellMarket(region)}
-                      disabled={!hasData || !region}
-                      className={`px-3 py-1 text-sm rounded-full border transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
-                        isActive
-                          ? 'border-eve-blue text-eve-blue bg-eve-blue/10'
-                          : 'theme-border theme-text-secondary hover:border-eve-blue hover:text-eve-blue'
-                      }`}
-                      title={hub.regionName}
-                    >
-                      {hub.systemName}
-                    </button>
-                  );
-                })}
+                {favoriteIds.size > 0
+                  ? [...favoriteIds].map(id => {
+                      const region = regions?.find(r => r.regionId === id);
+                      if (!region) return null;
+                      const isActive = sellMarket?.regionId === id;
+                      return (
+                        <span key={id} className="inline-flex items-center">
+                          <button
+                            onClick={() => setSellMarket(region)}
+                            disabled={!hasData}
+                            className={`px-3 py-1 text-sm rounded-l-full border-y border-l transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
+                              isActive
+                                ? 'border-eve-blue text-eve-blue bg-eve-blue/10'
+                                : 'theme-border theme-text-secondary hover:border-eve-blue hover:text-eve-blue'
+                            }`}
+                          >
+                            {region.name}
+                          </button>
+                          <button
+                            onClick={() => toggleFavorite(id)}
+                            disabled={!hasData}
+                            aria-label={`Remove ${region.name} from favorites`}
+                            className={`px-1.5 py-1 text-xs rounded-r-full border-y border-r transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
+                              isActive
+                                ? 'border-eve-blue text-eve-blue bg-eve-blue/10'
+                                : 'theme-border theme-text-secondary hover:border-red-400 hover:text-red-400'
+                            }`}
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      );
+                    })
+                  : TRADE_HUBS.map(hub => {
+                      const region = regions?.find(r => r.regionId === hub.regionId);
+                      const isActive = sellMarket?.regionId === hub.regionId;
+                      return (
+                        <button
+                          key={hub.regionId}
+                          onClick={() => region && setSellMarket(region)}
+                          disabled={!hasData || !region}
+                          className={`px-3 py-1 text-sm rounded-full border transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
+                            isActive
+                              ? 'border-eve-blue text-eve-blue bg-eve-blue/10'
+                              : 'theme-border theme-text-secondary hover:border-eve-blue hover:text-eve-blue'
+                          }`}
+                          title={hub.regionName}
+                        >
+                          {hub.systemName}
+                        </button>
+                      );
+                    })
+                }
               </div>
             </div>
           </div>

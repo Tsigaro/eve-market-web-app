@@ -26,7 +26,11 @@
       "Bash(CLOUDFLARE_API_TOKEN=\"TQ_VkIC9PtngQ-WzEJQAF2Pv92Ch7Ph6CLXtZ1mW\" CLOUDFLARE_ACCOUNT_ID=\"99bab8e5adb9b799c73d994c08948658\" npx wrangler pages deploy /c/Users/s-nar/src/eve-market-web-app/webapp/out --project-name eve-market-web-app --branch main --commit-dirty=true)",
       "Bash(gh secret list --repo Tsigaro/eve-market-web-app)",
       "Bash(where gh)",
-      "Bash(npx gh secret list --repo Tsigaro/eve-market-web-app)"
+      "Bash(npx gh secret list --repo Tsigaro/eve-market-web-app)",
+      "Bash(npm install --save-dev vitest @vitejs/plugin-react @testing-library/react @testing-library/user-event @testing-library/jest-dom jsdom)",
+      "Bash(npx vitest run src/lib/__tests__/use-favorite-regions.test.ts)",
+      "Bash(npx vitest run src/components/RegionSelector.test.tsx)",
+      "Bash(npx vitest run)"
     ]
   }
 }
