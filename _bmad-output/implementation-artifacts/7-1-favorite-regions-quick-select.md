@@ -5,54 +5,52 @@ Status: draft
 ## Story
 
 As a user,
-I want to mark regions as favorites and have them appear at the top of the region dropdown,
-So that I can quickly select my frequently used regions without scrolling through the full list.
+I want to mark regions as favorites and see them as quick-pick pills below the region selector,
+So that I can select my frequently used regions with a single click without searching.
 
 ## Acceptance Criteria
 
-**AC1 — Favorites section in dropdown:**
-Given the region dropdown is open with an empty search query,
-When I have at least one favorite region saved,
-Then a "Favorites" section appears at the top of the dropdown list,
-And favorite regions are listed there before all other regions,
-And a visual separator divides the Favorites section from the full region list below.
+**AC1 — Star button next to selector:**
+Given a region is selected in a RegionSelector,
+When I view the selector,
+Then a star button (★ filled / ☆ hollow) appears immediately to the right of the input,
+And if the selected region is already a favorite the star is filled (★),
+And if it is not yet a favorite the star is hollow (☆),
+And clicking the star toggles the region's favorite status.
 
-**AC2 — Star toggle in dropdown:**
-Given the region dropdown is open,
-When I hover over any region row,
-Then a star icon (☆) appears on the right side of the row,
-And if the region is already a favorite, the star is filled (★),
-And clicking the star toggles the region's favorite status without closing the dropdown,
-And the Favorites section updates immediately to reflect the change.
+**AC2 — Favorites pills row:**
+Given I have at least one favorite region saved,
+When I view the page,
+Then the quick-pick pill buttons below each selector show my favorite regions,
+And each favorite pill has a small ✕ button to remove it from favorites,
+And clicking a pill (not ✕) sets that selector's region as before.
 
-**AC3 — Persistence:**
-Given I have added regions to favorites,
+**AC3 — Pills fallback:**
+Given I have no favorites saved,
+When I view the page,
+Then the quick-pick pills fall back to the hardcoded TRADE_HUBS list (Jita, Amarr, Hek, Dodixie, Rens) without ✕ buttons,
+So new users always see useful quick-picks.
+
+**AC4 — Persistence:**
+Given I have toggled favorite regions,
 When I refresh the page or open a new session,
 Then my favorites are still present,
 And favorites are stored in localStorage under key `eve-market-favorite-regions` as an array of regionId numbers.
 
-**AC4 — Favorites shared across selectors:**
-Given I have favorite regions set,
-When I open either the Buy Market or Sell Market dropdown,
-Then both show the same favorites section,
-And starring a region in one selector reflects immediately in the other.
+**AC5 — Favorites shared across selectors:**
+Given I star a region using the Buy Market selector,
+When I look at the Sell Market selector pills,
+Then the same favorite is reflected there immediately,
+Because both selectors share one `useFavoriteRegions` instance in the parent page.
 
-**AC5 — Pills row shows favorites:**
-Given I have at least one favorite region,
-When I view the page,
-Then the quick-pick pill buttons below each selector show my favorite regions,
-And clicking a pill sets that selector's region (existing behaviour).
+**AC6 — Star button hidden when no region selected:**
+Given no region is currently selected in a selector,
+When I view that selector,
+Then no star button is shown (nothing to favorite).
 
-**AC6 — Pills fallback:**
-Given I have no favorites saved,
-When I view the page,
-Then the quick-pick pills fall back to the hardcoded TRADE_HUBS list (Jita, Amarr, Hek, Dodixie, Rens),
-So new users always see useful quick-picks.
-
-**AC7 — Favorites section hidden when searching:**
-Given I am typing a query in the region selector,
-When the query is non-empty,
-Then the Favorites section is hidden and normal search results are shown (no change to existing search behaviour).
+**AC7 — No changes to dropdown search behaviour:**
+The existing search/combobox behaviour of RegionSelector is unchanged.
+No favorites section is added inside the dropdown.
 
 ## Technical Design
 
@@ -60,7 +58,7 @@ Then the Favorites section is hidden and normal search results are shown (no cha
 
 **File:** `webapp/src/lib/use-favorite-regions.ts`
 
-- SSR-safe: reads localStorage only on client (useEffect / lazy init)
+- SSR-safe: reads localStorage only on client (lazy state initialiser with `() =>` function)
 - localStorage key: `eve-market-favorite-regions`
 - Stored value: `number[]` of regionIds
 - Returns:
@@ -68,60 +66,134 @@ Then the Favorites section is hidden and normal search results are shown (no cha
   - `toggleFavorite: (regionId: number) => void`
   - `isFavorite: (regionId: number) => boolean`
 
+```typescript
+'use client';
+
+import { useState } from 'react';
+
+const LS_KEY = 'eve-market-favorite-regions';
+
+function readFromStorage(): Set<number> {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return new Set();
+    return new Set(JSON.parse(raw) as number[]);
+  } catch {
+    return new Set();
+  }
+}
+
+export function useFavoriteRegions() {
+  const [favoriteIds, setFavoriteIds] = useState<Set<number>>(() => {
+    if (typeof window === 'undefined') return new Set();
+    return readFromStorage();
+  });
+
+  const toggleFavorite = (regionId: number) => {
+    setFavoriteIds(prev => {
+      const next = new Set(prev);
+      if (next.has(regionId)) {
+        next.delete(regionId);
+      } else {
+        next.add(regionId);
+      }
+      localStorage.setItem(LS_KEY, JSON.stringify([...next]));
+      return next;
+    });
+  };
+
+  const isFavorite = (regionId: number) => favoriteIds.has(regionId);
+
+  return { favoriteIds, toggleFavorite, isFavorite };
+}
+```
+
 ### Updated: `RegionSelector`
 
 **File:** `webapp/src/components/RegionSelector.tsx`
 
 New optional props:
 ```typescript
-favoriteIds?: Set<number>;
-onToggleFavorite?: (regionId: number) => void;
+isFavorite?: boolean;          // is the currently selected region a favorite?
+onToggleFavorite?: () => void; // called when star button is clicked
 ```
 
-Dropdown behaviour changes (empty query only):
-- If `favoriteIds` has entries: render a Favorites section at top, then a `<hr>` separator, then all regions
-- Each row: show star icon button (★ filled / ☆ hollow) on the right; visible on hover of row
-- Star click calls `onToggleFavorite(regionId)` and stops propagation (does not select region)
+Render a star button to the right of the input when `value` is non-null and `onToggleFavorite` is provided:
+```tsx
+{value && onToggleFavorite && (
+  <button
+    type="button"
+    onClick={onToggleFavorite}
+    aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+    className="ml-2 text-eve-gold hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-eve-blue"
+  >
+    {isFavorite ? '★' : '☆'}
+  </button>
+)}
+```
+
+The star button sits alongside the selector input, not inside the combobox dropdown.
 
 ### Updated: `page.tsx` (home page)
 
 **File:** `webapp/src/app/page.tsx`
 
-- Import and call `useFavoriteRegions()`
-- Pass `favoriteIds` and `onToggleFavorite` to both `<RegionSelector>` instances
-- Replace hardcoded TRADE_HUBS pills with favorites pills; fall back to TRADE_HUBS when `favoriteIds` is empty
+- Call `useFavoriteRegions()` once at the top of `HomePageContent`
+- Pass `isFavorite` and `onToggleFavorite` to both `<RegionSelector>` instances
+- Replace the hardcoded TRADE_HUBS pills section with a shared `FavoritesPills` inline block:
+  - If `favoriteIds.size > 0`: render one pill per favorite region with a `✕` remove button
+  - Else: render TRADE_HUBS pills as before (no ✕)
+
+Pills row shape (favorites active):
+```tsx
+{favoriteIds.size > 0
+  ? [...favoriteIds].map(id => {
+      const region = regions?.find(r => r.regionId === id);
+      if (!region) return null;
+      return (
+        <span key={id} className="inline-flex items-center gap-0.5">
+          <button onClick={() => setMarket(region)} className="pill-active-classes">
+            {region.name}
+          </button>
+          <button onClick={() => toggleFavorite(id)} aria-label={`Remove ${region.name} from favorites`}
+            className="text-xs opacity-50 hover:opacity-100">✕</button>
+        </span>
+      );
+    })
+  : TRADE_HUBS.map(hub => /* existing pill render */)}
+```
 
 ## Tasks / Subtasks
 
 - [ ] **Task 1: Create `useFavoriteRegions` hook**
-  - [ ] 1.1 Create `webapp/src/lib/use-favorite-regions.ts`
-  - [ ] 1.2 Implement SSR-safe localStorage read (lazy initialiser or `useEffect`)
-  - [ ] 1.3 Implement `toggleFavorite` — adds if absent, removes if present; writes to localStorage
-  - [ ] 1.4 Write unit tests in `webapp/src/lib/__tests__/use-favorite-regions.test.ts`
+  - [ ] 1.1 Create `webapp/src/lib/use-favorite-regions.ts` using design above
+  - [ ] 1.2 Write unit tests in `webapp/src/lib/__tests__/use-favorite-regions.test.ts`
     - [ ] Returns empty set on first load (no localStorage)
-    - [ ] Adds a regionId and persists to localStorage
-    - [ ] Removes an existing regionId and persists
-    - [ ] Hydrates correctly from existing localStorage value
-    - [ ] `isFavorite` returns true/false correctly
+    - [ ] `toggleFavorite` adds a regionId not yet in the set
+    - [ ] `toggleFavorite` removes a regionId already in the set
+    - [ ] State persists to localStorage on each toggle
+    - [ ] Hydrates correctly from existing localStorage value on init
+    - [ ] `isFavorite` returns true for saved id, false for unsaved
 
-- [ ] **Task 2: Update `RegionSelector` to show favorites section and star toggles**
-  - [ ] 2.1 Add optional props `favoriteIds` and `onToggleFavorite` to `RegionSelectorProps`
-  - [ ] 2.2 When empty query and favorites exist: render favorites section above all regions with a separator
-  - [ ] 2.3 Add star icon button per row — filled (★) if favorite, hollow (☆) otherwise
-  - [ ] 2.4 Star button click: call `onToggleFavorite`, stop event propagation
-  - [ ] 2.5 Hide favorites section when query is non-empty (AC7)
-  - [ ] 2.6 Write/update tests in `webapp/src/components/__tests__/RegionSelector.test.tsx`
-    - [ ] Renders favorites section when `favoriteIds` is non-empty and query is empty
-    - [ ] Does not render favorites section when query is non-empty
-    - [ ] Star button calls `onToggleFavorite` with correct regionId
-    - [ ] Star button does not trigger region selection
-    - [ ] No favorites section rendered when `favoriteIds` is empty or props omitted
+- [ ] **Task 2: Add star button to `RegionSelector`**
+  - [ ] 2.1 Add optional props `isFavorite` and `onToggleFavorite` to `RegionSelectorProps`
+  - [ ] 2.2 Render star button (★/☆) to the right of the combobox input when `value` is non-null and `onToggleFavorite` is provided
+  - [ ] 2.3 Star button must not interfere with combobox open/close or keyboard navigation
+  - [ ] 2.4 Write tests in `webapp/src/components/__tests__/RegionSelector.test.tsx`
+    - [ ] Star button renders when value is set and `onToggleFavorite` is provided
+    - [ ] Star button does not render when value is null
+    - [ ] Star button does not render when `onToggleFavorite` is not provided
+    - [ ] Star button shows ★ when `isFavorite` is true
+    - [ ] Star button shows ☆ when `isFavorite` is false
+    - [ ] Clicking star button calls `onToggleFavorite`
 
-- [ ] **Task 3: Update `page.tsx` to wire favorites**
-  - [ ] 3.1 Import and call `useFavoriteRegions()` in `HomePageContent`
-  - [ ] 3.2 Pass `favoriteIds` and `onToggleFavorite` to both `<RegionSelector>` instances
-  - [ ] 3.3 Replace TRADE_HUBS pills with favorites pills; fallback to TRADE_HUBS when no favorites
-  - [ ] 3.4 Verify pills behaviour: clicking pill still sets correct region (buy or sell)
+- [ ] **Task 3: Wire favorites into `page.tsx`**
+  - [ ] 3.1 Call `useFavoriteRegions()` in `HomePageContent`
+  - [ ] 3.2 Pass correct `isFavorite` and `onToggleFavorite` to Buy Market `<RegionSelector>`
+  - [ ] 3.3 Pass correct `isFavorite` and `onToggleFavorite` to Sell Market `<RegionSelector>`
+  - [ ] 3.4 Replace TRADE_HUBS pills with favorites pills (with ✕) when favorites exist; fall back to TRADE_HUBS when empty
+  - [ ] 3.5 Verify ✕ on a pill calls `toggleFavorite` and pill disappears immediately
+  - [ ] 3.6 Verify fallback pills (TRADE_HUBS) still set the correct region on click
 
 ## Dev Agent Record
 
