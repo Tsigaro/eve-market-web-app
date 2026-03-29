@@ -1,0 +1,146 @@
+[
+  {
+    "regionId": 10000054,
+    "name": "Aridia"
+  },
+  {
+    "regionId": 10000069,
+    "name": "Black Rise"
+  },
+  {
+    "regionId": 10000012,
+    "name": "Curse"
+  },
+  {
+    "regionId": 10000060,
+    "name": "Delve"
+  },
+  {
+    "regionId": 10000001,
+    "name": "Derelik"
+  },
+  {
+    "regionId": 10000036,
+    "name": "Devoid"
+  },
+  {
+    "regionId": 10000043,
+    "name": "Domain"
+  },
+  {
+    "regionId": 10000064,
+    "name": "Essence"
+  },
+  {
+    "regionId": 10000037,
+    "name": "Everyshore"
+  },
+  {
+    "regionId": 10000058,
+    "name": "Fountain"
+  },
+  {
+    "regionId": 10000067,
+    "name": "Genesis"
+  },
+  {
+    "regionId": 10000011,
+    "name": "Great Wildlands"
+  },
+  {
+    "regionId": 10000030,
+    "name": "Heimatar"
+  },
+  {
+    "regionId": 10000009,
+    "name": "Insmother"
+  },
+  {
+    "regionId": 10000052,
+    "name": "Kador"
+  },
+  {
+    "regionId": 10000049,
+    "name": "Khanid"
+  },
+  {
+    "regionId": 10000065,
+    "name": "Kor-Azor"
+  },
+  {
+    "regionId": 10000016,
+    "name": "Lonetrek"
+  },
+  {
+    "regionId": 10000042,
+    "name": "Metropolis"
+  },
+  {
+    "regionId": 10000028,
+    "name": "Molden Heath"
+  },
+  {
+    "regionId": 10000057,
+    "name": "Outer Ring"
+  },
+  {
+    "regionId": 10000048,
+    "name": "Placid"
+  },
+  {
+    "regionId": 10000070,
+    "name": "Pochven"
+  },
+  {
+    "regionId": 10000023,
+    "name": "Pure Blind"
+  },
+  {
+    "regionId": 10000032,
+    "name": "Sinq Laison"
+  },
+  {
+    "regionId": 10000044,
+    "name": "Solitude"
+  },
+  {
+    "regionId": 10000022,
+    "name": "Stain"
+  },
+  {
+    "regionId": 10000041,
+    "name": "Syndicate"
+  },
+  {
+    "regionId": 10000020,
+    "name": "Tash-Murkon"
+  },
+  {
+    "regionId": 10000061,
+    "name": "Tenerifis"
+  },
+  {
+    "regionId": 10000038,
+    "name": "The Bleak Lands"
+  },
+  {
+    "regionId": 10000033,
+    "name": "The Citadel"
+  },
+  {
+    "regionId": 10000002,
+    "name": "The Forge"
+  },
+  {
+    "regionId": 10000015,
+    "name": "Venal"
+  },
+  {
+    "regionId": 10000068,
+    "name": "Verge Vendor"
+  },
+  {
+    "regionId": 10001000,
+    "name": "Yasna Zakh"
+  }
+]
